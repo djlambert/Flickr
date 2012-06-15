@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<client>
+    <commands>
+        <!-- Abstract commands -->
+        <command name="paginated">
+            <param name="per_page" type="integer" required="false" location="query" doc="Number of items to return per page. If this argument is omitted, it defaults to 10. The maximum allowed value is 50." />
+            <param name="page" type="integer" required="false" location="query" doc="The page of results to return. If this argument is omitted, it defaults to 1." />
+        </command>
+
+        <!-- activity -->
+        <command name="activity.userComments" extends="paginated" method="GET" uri="?method=flickr.activity.userComments">
+            <doc>Returns a list of recent activity on photos commented on by the calling user. Do not poll this method more than once an hour. This method requires authentication with 'read' permission.</doc>
+        </command>
+        <command name="activity.userPhotos" extends="paginated" method="GET" uri="?method=flickr.activity.userPhotos">
+            <doc>Returns a list of recent activity on photos belonging to the calling user. Do not poll this method more than once an hour. This method requires authentication with 'read' permission.</doc>
+            <param name="timeframe" type="regex:/[0-9]+[dh]/" location="query" doc="The timeframe in which to return updates for. This can be specified in days ('2d') or hours ('4h'). The default behavoir is to return changes since the beginning of the previous user session." />
+        </command>
+
+        <!-- auth (DEPRECATED, use auth.oauth) -->
+        <command name="auth.checkToken" method="GET" uri="?method=flickr.auth.checkToken">
+            <doc>Returns the credentials attached to an authentication token. This call must be signed, and is deprecated in favour of OAuth. This method does not require authentication.</doc>
+            <param name="auth_token" type="string" required="true" location="query" doc="The authentication token to check." />
+        </command>
+        <command name="auth.getFrob" method="GET" uri="?method=flickr.auth.getFrob">
+            <doc>Returns a frob to be used during authentication. This method call must be signed, and is deprecated in favour of OAuth. This method does not require authentication.</doc>
+        </command>
+        <command name="auth.getFullToken" method="GET" uri="?method=flickr.auth.getFullToken">
+            <doc>Get the full authentication token for a mini-token. This method call must be signed, and is deprecated in favour of OAuth. This method does not require authentication.</doc>
+            <param name="mini_token" type="string" location="query" doc="The mini-token typed in by a user. It should be 9 digits long. It may optionally contain dashes." />
+        </command>
+        <command name="auth.getToken" method="GET" uri="?method=flickr.auth.getToken">
+            <doc>Returns the auth token for the given frob, if one has been attached. This method call must be signed, and is deprecated in favour of OAuth. This method does not require authentication.</doc>
+            <param name="frob" type="string" required="true" location="query" doc="The frob to check." />
+        </command>
+
+        <!-- auth.oauth -->
+        <command name="auth.oauth.checkToken" method="GET" uri="?method=flickr.auth.oauth.checkToken">
+            <doc>Returns the credentials attached to an OAuth authentication token. This method does not require user authentication, but the request must be signed.</doc>
+            <param name="oauth_token" type="string" required="true" location="query" doc="The OAuth authentication token to check." />
+        </command>
+        <command name="auth.oauth.getAccessToken" method="GET" uri="?method=flickr.auth.oauth.getAccessToken">
+            <doc>Exchange an auth token from the old Authentication API, to an OAuth access token. Calling this method will delete the auth token used to make the request. This method does not require user authentication, but the request must be signed.</doc>
+        </command>
+
+        <!-- blogs -->
+        <command name="blogs.getList" method="GET" uri="?method=flickr.blogs.getList">
+            <doc>Get a list of configured blogs for the calling user. This method requires authentication with 'read' permission.</doc>
+            <param name="service" type="string" location="query" doc="Optionally only return blogs for a given service id. You can get a list of from blogs.getServices()." />
+        </command>
+        <command name="blogs.getServices" method="GET" uri="?method=flickr.blogs.getServices">
+            <doc>Return a list of Flickr supported blogging services. This method does not require authentication.</doc>
+        </command>
+        <command name="blogs.postPhoto" method="POST" uri="?method=flickr.blogs.postPhoto">
+            <doc>Post a photo to a blog. This method requires authentication with 'write' permission.</doc>
+            <param name="blog_id" type="string" location="body" doc="The id of the blog to post to." />
+            <param name="photo_id" type="string" required="true" location="body" doc="The id of the photo to blog." />
+            <param name="title" type="string" required="true" location="body" doc="The blog post title." />
+            <param name="description" type="string" required="true" location="body" doc="The blog post body." />
+            <param name="blog_password" type="string" location="body" doc="The password for the blog (used when the blog does not have a stored password)." />
+            <param name="service" type="string" location="body" doc="A Flickr supported blogging service. Instead of passing a blog id you can pass a service id and we'll post to the first blog of that service we find." />
+        </command>
+
+        <!-- collections -->
+        <command name="collections.getInfo" method="GET" uri="?method=flickr.collections.getInfo">
+            <doc>Returns information for a single collection. Currently can only be called by the collection owner, this may change. This method requires authentication with 'read' permission.</doc>
+            <param name="collection_id" type="string" required="true" location="query" doc="The ID of the collection to fetch information for." />
+        </command>
+        <command name="collections.getTree" method="GET" uri="?method=flickr.collections.getTree">
+            <doc>Returns a tree (or sub tree) of collections belonging to a given user. This method does not require authentication.</doc>
+            <param name="collection_id" type="string" location="query" doc="The ID of the collection to fetch a tree for, or zero to fetch the root collection. Defaults to zero." />
+            <param name="user_id" type="string" location="query" doc="The ID of the account to fetch the collection tree for. Deafults to the calling user." />
+        </command>
+
+        <!-- commons -->
+        <command name="commons.getInstitutions" method="GET" uri="?method=flickr.commons.getInstitutions">
+            <doc>Retrieves a list of the current Commons institutions. This method does not require authentication.</doc>
+        </command>
+
+        <!-- contacts -->
+        <command name="contacts.getList" extends="paginated" method="GET" uri="?method=flickr.contacts.getList">
+            <doc>Get a list of contacts for the calling user. This method requires authentication with 'read' permission.</doc>
+            <param name="filter" type="enum:friends,family,both,neither" location="query" doc="An optional filter of the results." />
+            <param name="sort" type="enum:name,time" location="query" doc="The order in which to sort the returned contacts. Defaults to name." />
+        </command>
+        <command name="contacts.getListRecentlyUploaded" method="GET" uri="?method=flickr.contacts.getListRecentlyUploaded">
+            <doc>(EXPERIMENTAL) Return a list of contacts for a user who have recently uploaded photos along with the total count of photos uploaded. This method requires authentication with 'read' permission.</doc>
+            <param name="date_lastupload" type="string" location="query" doc="Limits the resultset to contacts that have uploaded photos since this date. The date should be in the form of a Unix timestamp. The default offset is (1) hour and the maximum (24) hours." />
+            <param name="filter" type="enum:ff,all" location="query" doc="Limit the result set to all contacts or only those who are friends or family." />
+        </command>
+        <command name="contacts.getPublicList" extends="paginated" method="GET" uri="?method=flickr.contacts.getPublicList">
+            <doc>Get the contact list for a user. This method does not require authentication.</doc>
+            <param name="user_id" type="string" required="true" location="query" doc="The NSID of the user to fetch the contact list for." />
+        </command>
+        <command name="contacts.getTaggingSuggestions" extends="paginated" method="GET" uri="?method=flickr.contacts.getTaggingSuggestions">
+            <doc>Get suggestions for tagging people in photos based on the calling user's contacts. This method requires authentication with 'read' permission.</doc>
+        </command>
+
+        <!-- favorites -->
+        <command name="favorites.add" method="POST" uri="?method=flickr.favorites.add">
+            <doc>Adds a photo to a user's favorites list. This method requires authentication with 'write' permission.</doc>
+            <param name="photo_id" type="string" required="true" location="body" doc="The id of the photo to add to the user's favorites." />
+        </command>
+        <command name="favorites.getContext" method="GET" uri="?method=flickr.favorites.getContext">
+            <doc>Returns next and previous favorites for a photo in a user's favorites. This method does not require authentication.</doc>
+            <param name="photo_id" type="string" required="true" location="query" doc="The id of the photo to fetch the context for." />
+            <param name="user_id" type="string" required="true" location="query" doc="The user who counts the photo as a favorite." />
+        </command>
+        <command name="favorites.getList" extends="paginated" method="GET" uri="?method=flickr.favorites.getList">
+            <doc>Returns a list of the user's favorite photos. Only photos which the calling user has permission to see are returned. This method requires authentication with 'read' permission.</doc>
+            <param name="user_id" type="string" location="query" doc="The NSID of the user to fetch the favorites list for. If this argument is omitted, the favorites list for the calling user is returned." />
+            <param name="min_fave_date" type="string" location="query" doc="Minimum date that a photo was favorited on. The date should be in the form of a unix timestamp." />
+            <param name="max_fave_date" type="string" location="query" doc="Maximum date that a photo was favorited on. The date should be in the form of a unix timestamp." />
+            <param name="extras" type="string" location="query" doc="A comma-delimited list of extra information to fetch for each returned record." />
+        </command>
+        <command name="favorites.getPublicList" extends="paginated" method="GET" uri="?method=flickr.favorites.getPublicList">
+            <doc>Returns a list of favorite public photos for the given user. This method does not require authentication.</doc>
+            <param name="user_id" type="string" location="query" doc="The NSID of the user to fetch the favorites list for." />
+            <param name="min_fave_date" type="string" location="query" doc="Minimum date that a photo was favorited on. The date should be in the form of a unix timestamp." />
+            <param name="max_fave_date" type="string" location="query" doc="Maximum date that a photo was favorited on. The date should be in the form of a unix timestamp." />
+            <param name="extras" type="string" location="query" doc="A comma-delimited list of extra information to fetch for each returned record." />
+        </command>
+        <command name="favorites.remove" method="POST" uri="?method=flickr.favorites.remove">
+            <doc>Removes a photo from a user's favorites list. This method requires authentication with 'write' permission.</doc>
+            <param name="photo_id" type="string" location="query" doc="The id of the photo to remove from the user's favorites." />
+        </command>
+
+        <!-- galleries -->
+        <command name="galleries.addPhoto" method="POST" uri="?method=flickr.galleries.addPhoto">
+            <doc>Add a photo to a gallery. This method requires authentication with 'write' permission.</doc>
+            <param name="gallery_id" type="string" required="true" location="body" doc="The ID of the gallery to add a photo to. Note: this is the compound ID returned in methods like galleries.getList(), and galleries.getListForPhoto()." />
+            <param name="photo_id" type="string" required="true" location="body" doc="The photo ID to add to the gallery" />
+            <param name="comment" type="string" location="body" doc="A short comment or story to accompany the photo." />
+        </command>
+        <command name="galleries.create" method="POST" uri="?method=flickr.galleries.create">
+            <doc>Create a new gallery for the calling user. This method requires authentication with 'write' permission.</doc>
+            <param name="title" type="string" required="true" location="body" doc="The name of the gallery." />
+            <param name="description" type="string" required="true" location="body" doc="A short description for the gallery." />
+            <param name="primary_photo_id" type="string" location="body" doc="The first photo to add to your gallery" />
+        </command>
+        <command name="galleries.editMeta" method="POST" uri="?method=flickr.galleries.editMeta">
+            <doc>Modify the meta-data for a gallery. This method requires authentication with 'write' permission.</doc>
+            <param name="gallery_id" type="string" required="true" location="body" doc="The gallery ID to update." />
+            <param name="title" type="string" required="true" location="body" doc="The new title for the gallery." />
+            <param name="description" type="string" location="body" doc="The new description for the gallery." />
+        </command>
+        <command name="galleries.editPhoto" method="POST" uri="?method=flickr.galleries.editPhoto">
+            <doc>Edit the comment for a gallery photo. This method requires authentication with 'write' permission.</doc>
+            <param name="gallery_id" type="string" required="true" location="body" doc="The ID of the gallery to add a photo to. Note: this is the compound ID returned in methods like galleries.getList, and galleries.getListForPhoto()." />
+            <param name="photo_id" type="string" required="true" location="body" doc="The photo ID to add to the gallery." />
+            <param name="comment" type="string" required="true" location="body" doc="The updated comment the photo." />
+        </command>
+        <command name="galleries.editPhotos" method="POST" uri="?method=flickr.galleries.editPhotos">
+            <doc>Modify the photos in a gallery. Use this method to add, remove and re-order photos. This method requires authentication with 'write' permission.</doc>
+            <param name="gallery_id" type="string" required="true" location="body" doc="The id of the gallery to modify. The gallery must belong to the calling user." />
+            <param name="primary_photo_id" type="string" required="true" location="body" doc="The id of the photo to use as the 'primary' photo for the gallery. This id must also be passed along in photo_ids list argument." />
+            <param name="photo_ids" type="string" required="true" location="body" doc="A comma-delimited list of photo ids to include in the gallery. They will appear in the set in the order sent. This list must contain the primary photo id. This list of photos replaces the existing list." />
+        </command>
+        <command name="galleries.getInfo" method="GET" uri="?method=flickr.galleries.getInfo">
+            <doc>Get information on a gallery. This method does not require authentication.</doc>
+            <param name="gallery_id" type="string" required="true" location="query" doc="The gallery ID you are requesting information for." />
+        </command>
+        <command name="galleries.getList" extends="paginated" method="GET" uri="?method=flickr.galleries.getList">
+            <doc>Return the list of galleries created by a user. Sorted from newest to oldest. This method does not require authentication.</doc>
+            <param name="user_id" type="string" location="query" doc="The NSID of the user to get a galleries list for. If none is specified, the calling user is assumed." />
+        </command>
+        <command name="galleries.getListForPhoto" extends="paginated" method="GET" uri="?method=flickr.galleries.getListForPhoto">
+            <doc>Return the list of galleries to which a photo has been added. Galleries are returned sorted by date which the photo was added to the gallery. This method does not require authentication.</doc>
+            <param name="photo_id" type="string" required="true" location="query" doc="The ID of the photo to fetch a list of galleries for." />
+        </command>
+        <command name="galleries.getPhotos" extends="paginated" method="GET" uri="?method=flickr.galleries.getPhotos">
+            <doc>Return the list of photos for a gallery. This method does not require authentication.</doc>
+            <param name="gallery_id" type="string" required="true" location="query" doc="The ID of the gallery of photos to return." />
+            <param name="extras" type="string" location="query" doc="A comma-delimited list of extra information to fetch for each returned record." />
+        </command>
+
+        <!-- TODO -->
+        <!-- groups -->
+        <!-- groups.discuss.replies -->
+        <!-- groups.discuss.topics -->
+        <!-- groups.members -->
+        <!-- groups.pools -->
+        <!-- interestingness -->
+        <!-- machinetags -->
+        <!-- panda -->
+        <!-- people -->
+        <!-- photos -->
+        <!-- photos.comments -->
+        <!-- photos.geo -->
+        <!-- photos.licences -->
+        <!-- photos.notes -->
+        <!-- photos.people -->
+        <!-- photos.suggestions -->
+        <!-- photos.transform -->
+        <!-- photos.upload -->
+        <!-- photosets -->
+        <!-- photosets.comments -->
+        <!-- places -->
+        <!-- prefs -->
+        <!-- push -->
+        <!-- reflection -->
+        <!-- stats -->
+        <!-- tags -->
+        <!-- urls -->
+        <!-- ENDTODO -->
+
+        <!-- test -->
+        <command name="test.echo" method="GET" uri="?method=flickr.test.echo">
+            <doc>A testing method which echo's all parameters back in the response. This method does not require authentication.</doc>
+        </command>
+        <command name="test.login" method="GET" uri="?method=flickr.test.login">
+            <doc>A testing method which checks if the caller is logged in then returns their username. This method requires authentication with 'read' permission.</doc>
+        </command>
+        <command name="test.null" method="GET" uri="?method=flickr.test.null">
+            <doc>Null test. This method requires authentication with 'read' permission.</doc>
+        </command>
+    </commands>
+</client>

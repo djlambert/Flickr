@@ -1,0 +1,24 @@
+{
+    "name": "qal/flickr",
+    "type": "library",
+    "description": "Client for the Flickr API",
+    "keywords": ["flickr", "api", "guzzle"],
+    "homepage": "http://qal.github.com/flickr/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Bazire",
+            "email": "nicolas.bazire@gmail.com",
+            "homepage": "http://nbazire.fr/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "ext-OAuth": "*",
+        "guzzle/guzzle": "2.6.*"
+    },
+    "autoload": {
+        "psr-0": { "Qal\\Api\\Flickr": "" }
+    },
+    "target-dir": "Qal/Api/Flickr"
+}
